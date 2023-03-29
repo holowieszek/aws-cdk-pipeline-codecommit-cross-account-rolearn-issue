@@ -1,15 +1,26 @@
-# Welcome to your CDK TypeScript project
+CDK Pipeline Construct fails in the cross-account configuration due to a lack of RoleArn property.
 
-You should explore the contents of this project. It demonstrates a CDK app with an instance of a stack (`IssueStack`)
-which contains an Amazon SQS queue that is subscribed to an Amazon SNS topic.
+![Simplified-Architecture](architecture.drawio.png)
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+# Bootstrapping
 
-## Useful commands
+**DEVELOPMENT ACCOUNT:**  
+```cdk bootstrap aws://DEVELOPMENT_ACCOUNT_NUMBER/eu-central-1 --toolkit-stack-name BugReproduceCDKToolkit --qualifier bugreproduce```
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+**REPOSITORY ACCOUNT:**  
+```cdk bootstrap REPOSITORY_ACCOUNT_NUMBER/eu-central-1 --cloudformation-execution-policies 'arn:aws:iam::REPOSITORY_ACCOUNT_NUMBER:policy/AdministratorAccess' --trust 'DEVELOPMENT_ACCOUNT_NUMBER' --trust-for-lookup 'DEVELOPMENT_ACCOUNT_NUMBER' --toolkit-stack-name BugReproduceCDKToolkit --qualifier bugreproduce```
+
+> If you want to use other CDK Toolkit, remember to update bootstrapQualifier in the `cdk.json`
+
+
+# Deployment
+1. Assume role from the **development account**
+2. npx cdk synth
+3. npx cdk deploy --all
+
+```RoleArn is required for target arn:aws:events:eu-central-1:DEVELOPMENT_ACCOUNT_NUMBER:event-bus/default. (Service: AmazonCloudWatchEvents; Status Code: 400; Error Code: ValidationException; Request ID: 564e1b69-13ea-4c53-b411-0b68bae707ac; Proxy: null)```
+
+
+# Debugging
+`npx cdk synth BugReproduce-Repository-dev > RepositoryTemplate`  
+It creates AWS::Events::Rule resource without `RoleArn` in the `Targets`.

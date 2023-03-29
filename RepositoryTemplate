@@ -1,0 +1,108 @@
+Resources:
+  BugReproduceRepositorydevBugReproducePipelinedevPipeline60E290CDdevelopEventRule406D1E8D:
+    Type: AWS::Events::Rule
+    Properties:
+      EventPattern:
+        source:
+          - aws.codecommit
+        resources:
+          - arn:aws:codecommit:eu-central-1:111111111111:codecommit-repository
+        detail-type:
+          - CodeCommit Repository State Change
+        detail:
+          event:
+            - referenceCreated
+            - referenceUpdated
+          referenceName:
+            - develop
+      State: ENABLED
+      Targets:
+        - Arn: arn:aws:events:eu-central-1:222222222222:event-bus/default
+          Id: Target0
+    Metadata:
+      aws:cdk:path: BugReproduce-Repository-dev/BugReproduce-Repository-dev/BugReproducePipelinedevPipeline60E290CD-develop-EventRule/Resource
+  BugReproducePipelinedevPipeline60E290CDSourcecodecommitrepositoryActionRole03C700C1:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::222222222222:root
+        Version: "2012-10-17"
+      RoleName: bugreproduce-repository-dsitoryactionrolea86e0691f79b08d48ba7
+    Metadata:
+      aws:cdk:path: BugReproduce-Repository-dev/BugReproducePipelinedevPipeline60E290CD-Source-codecommit-repository-ActionRole/Resource
+  BugReproducePipelinedevPipeline60E290CDSourcecodecommitrepositoryActionRoleDefaultPolicyA1D43C8C:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:Abort*
+              - s3:DeleteObject*
+              - s3:GetBucket*
+              - s3:GetObject*
+              - s3:List*
+              - s3:PutObject
+              - s3:PutObjectLegalHold
+              - s3:PutObjectRetention
+              - s3:PutObjectTagging
+              - s3:PutObjectVersionTagging
+            Effect: Allow
+            Resource:
+              - arn:aws:s3:::bugreproduce-pipeline-deveartifactsbucket38861536c0775277279b
+              - arn:aws:s3:::bugreproduce-pipeline-deveartifactsbucket38861536c0775277279b/*
+          - Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+              - kms:Encrypt
+              - kms:GenerateDataKey*
+              - kms:ReEncrypt*
+            Effect: Allow
+            Resource: "*"
+          - Action:
+              - s3:PutObjectAcl
+              - s3:PutObjectVersionAcl
+            Effect: Allow
+            Resource: arn:aws:s3:::bugreproduce-pipeline-deveartifactsbucket38861536c0775277279b/*
+          - Action:
+              - codecommit:CancelUploadArchive
+              - codecommit:GetBranch
+              - codecommit:GetCommit
+              - codecommit:GetUploadArchiveStatus
+              - codecommit:UploadArchive
+            Effect: Allow
+            Resource: arn:aws:codecommit:eu-central-1:111111111111:codecommit-repository
+        Version: "2012-10-17"
+      PolicyName: BugReproducePipelinedevPipeline60E290CDSourcecodecommitrepositoryActionRoleDefaultPolicyA1D43C8C
+      Roles:
+        - Ref: BugReproducePipelinedevPipeline60E290CDSourcecodecommitrepositoryActionRole03C700C1
+    Metadata:
+      aws:cdk:path: BugReproduce-Repository-dev/BugReproducePipelinedevPipeline60E290CD-Source-codecommit-repository-ActionRole/DefaultPolicy/Resource
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAA/y2NTQrCMBCFz+J+MlpB0bUXkHgAiekI06YJdJKKhNzdxHb1vR9474jnKx525iPK9qNy/ML8iMaOoElCmi1B7Z6ZFvJRMOvkCG5v31iAzVSjsEWN9+DYfptdVSn/atsq4ENPOMh+6S7YnerzIMxqTj7yRKhX/gAWBrp4lQAAAA==
+    Metadata:
+      aws:cdk:path: BugReproduce-Repository-dev/CDKMetadata/Default
+Parameters:
+  BootstrapVersion:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cdk-bootstrap/bugreproduce/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
+Rules:
+  CheckBootstrapVersion:
+    Assertions:
+      - Assert:
+          Fn::Not:
+            - Fn::Contains:
+                - - "1"
+                  - "2"
+                  - "3"
+                  - "4"
+                  - "5"
+                - Ref: BootstrapVersion
+        AssertDescription: CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.
+
