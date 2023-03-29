@@ -24,7 +24,7 @@ const repositoryConfig = {
 const environmentConfig = {
   env: {
     account: developmentAccount,
-    region: region
+    region,
   }
 };
 
